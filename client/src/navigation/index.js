@@ -13,6 +13,7 @@ import { colors } from '../constants';
 import QRScanner from '../components/QRScanner';
 import Certified from '../screens/Certified';
 import NotCertified from '../screens/NotCertified';
+import LoginScreen from '../screens/Login';
 
 const Navigation = () => {
   const Stack = createStackNavigator();
@@ -52,6 +53,14 @@ const Navigation = () => {
             animationEnabled: false,
           }}
         />
+        <Stack.Screen
+          name="Login"
+          component={LoginScreen}
+          options={{
+            headerShown: false,
+            animationEnabled: false,
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
     // </AuthProvider>
@@ -67,8 +76,8 @@ const BottomTabNavigation = () => {
       shifting={true}
       barStyle={styles.bottomBar}>
       <Tab.Screen
-        name="UserScreen"
-        component={UserScreen}
+        name="LoginScreen"
+        component={LoginScreen}
         options={{
           tabBarLabel: 'User',
           tabBarColor: colors.blue3,
