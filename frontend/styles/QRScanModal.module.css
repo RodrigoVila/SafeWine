@@ -1,0 +1,31 @@
+.overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+}
+
+.text {
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-align: center;
+  color: #fff;
+}
+
+.qrContainer {
+  background-color: #000!important;
+}
+
+.button {
+  width: 100%;
+  margin-right: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

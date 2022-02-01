@@ -1,0 +1,36 @@
+.fill {
+  border: 2px solid;
+  border-radius: 5px;
+  margin: 5px 0;
+  padding: 10px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.outline {
+  border: 2px solid #fff;
+  border-radius: 3px;
+  margin: 5px 0;
+  padding: 10px;
+  color: #fff;
+  cursor: pointer;
+  background-color: transparent;
+}
+
+.label {
+  margin: 0;
+  padding: 0;
+}
+
+.outline:hover {
+  background-color: #fff;
+  transition: all 0.3s;
+  color: #000;
+}
+
+.fill:hover {
+  background-color: #fff!important;
+  border-color: #fff!important;
+  transition: all 0.3s;
+  color: #000;
+}
