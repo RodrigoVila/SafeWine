@@ -1,35 +1,22 @@
 .container {
-  width: 100%;
   height: 100vh;
-}
-
-.mainContent {
   display: flex;
-  color: #fff;
-}
-
-.leftContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  text-align: center;
   width: 100%;
-  height: 100%;
 }
 
-.infoContainer {
+.content {
+  color: #fff;
 }
 
 .title {
   font-size: 5rem;
   margin-bottom: 0;
-  margin-top: 100px;
+  margin-top: 0;
 }
 
 .description {
   font-size: 1.5rem;
-}
-
-.buttons {
-  display: flex;
 }

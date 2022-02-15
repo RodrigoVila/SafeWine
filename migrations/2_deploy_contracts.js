@@ -1,8 +1,8 @@
 const MainContract = artifacts.require("MainContract");
-const Token = artifacts.require("Token");
+const NFT = artifacts.require("NFT");
 
 module.exports = function (deployer) {
   deployer.deploy(MainContract);
-  deployer.deploy(Token);
+  deployer.deploy(NFT);
   // Additional contracts can be deployed here
 };

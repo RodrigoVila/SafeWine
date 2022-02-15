@@ -1,99 +1,49 @@
-import { MouseEvent, useEffect } from "react";
+import { useState, useEffect } from "react";
 import type { NextPage } from "next";
 import styles from "../styles/Dashboard.module.css";
-import Navbar from "../src/components/Navbar";
-import EmptyContainer from "../src/components/EmptyContainer";
-import Button from "../src/components/Button";
+import Sidebar from "../src/components/Sidebar";
 import Router from "next/router";
 import useWeb3 from "../src/hooks/useWeb3";
 import Link from "next/link";
+import Product from "../src/components/Product";
+import FilledButton from "../src/components/Buttons/Filled";
 
 const Dashboard: NextPage = () => {
-  const { currentAccount } = useWeb3();
-
-  const handleScanPress = (e: MouseEvent<HTMLElement>) => {
-    e.preventDefault();
-    Router.push("/scan");
-  };
-
-  const handleCreateBottle = (e: MouseEvent<HTMLElement>) => {
-    e.preventDefault();
-    Router.push("/add");
-  };
-
-  const handleDeleteBottle = (e: MouseEvent<HTMLElement>) => {
-    e.preventDefault();
-    Router.push("/delete");
-  };
-
-  const handleChangeOwnershop = (e: MouseEvent<HTMLElement>) => {
-    e.preventDefault();
-    Router.push("/ownership");
-  };
-
-  const handleSellBottle = (e: MouseEvent<HTMLElement>) => {
-    e.preventDefault();
-    Router.push("/sell");
-  };
+  const { currentAccount, tokens } = useWeb3();
 
   useEffect(() => {
-    console.log("curr", currentAccount.address);
     !currentAccount.address && Router.push("/");
   }, [currentAccount]);
 
+  useEffect(() => {
+    console.log("!tokens", tokens);
+  }, [tokens]);
+
+  const parseDate = (epoch: string) => {
+    const date = new Date(parseInt(epoch) * 1000).toString();
+    const spliced = date.slice(4, 15);
+    return spliced;
+  };
+
   return (
     <div className={styles.container}>
-      <Navbar />
+      <Sidebar />
       <div className={styles.mainContent}>
-        <div className={styles.leftContainer}>
-          <div className={styles.buttons}>
-            {currentAccount?.type === "cellar" && (
-              <>
-                <Button
-                  label="Scanner"
-                  type="outline"
-                  size="lg"
-                  onClick={handleScanPress}
-                />
-                <Button
-                  label="Create Bottle"
-                  type="outline"
-                  size="lg"
-                  onClick={handleCreateBottle}
-                />
-                <Button
-                  label="Delete Bottle"
-                  type="outline"
-                  size="lg"
-                  onClick={handleDeleteBottle}
-                />
-                <Button
-                  label="Change Bottle ownershop"
-                  type="outline"
-                  size="lg"
-                  onClick={handleChangeOwnershop}
-                />
-              </>
-            )}
-            {currentAccount?.type === "shop" && (
-              <>
-                <Button
-                  label="Scanner"
-                  type="outline"
-                  size="lg"
-                  onClick={handleScanPress}
-                />
-                <Button
-                  label="Sell Bottle"
-                  type="outline"
-                  size="lg"
-                  onClick={handleSellBottle}
-                />
-              </>
-            )}
-          </div>
+        <h2 className={styles.title}>Owned bottles by this account:</h2>
+        <div className={styles.list}>
+          {tokens.map((token) => {
+            return (
+              <Product
+                key={token.id}
+                name={token.name}
+                description={token.description}
+                uri={token.uri}
+                isValid={token.isAvailable}
+                mintedAt={parseDate(token.mintedAt)}
+              />
+            );
+          })}
         </div>
-        <EmptyContainer />
       </div>
     </div>
   );

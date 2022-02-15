@@ -1,24 +1,26 @@
 .container {
   width: 100%;
   height: 100vh;
+  display: flex;
+  align-items: center;
 }
 
 .mainContent {
-  display: flex;
   color: #fff;
-}
-
-.leftContainer {
-  display: flex;
+  justify-content: center;
   align-items: center;
-  justify-content: center;
   width: 100%;
-  height: 90vh;
+  height: 100%;
+  overflow-y: scroll;
 }
 
-.buttons {
+.title {
+  text-align: center;
+}
+
+.list {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   justify-content: center;
-  width: 50%;
+  align-items: center;
 }

@@ -1,60 +1,67 @@
-import { MouseEvent } from "react";
+import { MouseEvent, useState } from "react";
 import type { NextPage } from "next";
 import styles from "../styles/Home.module.css";
-import Navbar from "../src/components/Navbar";
-import EmptyContainer from "../src/components/EmptyContainer";
-import Button from "../src/components/Button";
+import Button from "../src/components/Buttons/Filled";
 import Router from "next/router";
 import useWeb3 from "../src/hooks/useWeb3";
+import AddressAndBrandInfo from "../src/components/AddressAndBrandInfo";
+import CreateAccount from "../src/components/CreateAccount";
+import { Spinner } from "../src/utils/Spinner";
 
 const Home: NextPage = () => {
-  const { currentAccount, getAcounts } = useWeb3();
+  const [isCreateAccount, setCreateAccount] = useState(false);
+  const {
+    currentAccount,
+    connectToMetamask,
+    createCellarAccount,
+    createShopAccount,
+  } = useWeb3();
 
-  const createAcount = (e: MouseEvent<HTMLElement>) => {
-    e.preventDefault();
-    Router.push("/create");
-  };
+  // const currentAccount = { address: "", name: "" };
 
   const goToDashboard = (e: MouseEvent<HTMLElement>) => {
     e.preventDefault();
     Router.push("/dashboard");
   };
 
+  const toggleCreateAccount = () => setCreateAccount(!isCreateAccount);
+
   return (
     <div className={styles.container}>
-      <Navbar />
-      <div className={styles.mainContent}>
-        <div className={styles.leftContainer}>
-          <div className={styles.infoContainer}>
-            <h1 className={styles.title}>SafeWine</h1>
-            <p className={styles.description}>
-              Exclusive birth certificates for each produced bottle
-            </p>
-            <p className={styles.description}>
-              Avoid counterfeit and bring trust to your customers
-            </p>
-            <div className={styles.buttons}>
-              {currentAccount?.address && !currentAccount?.name && (
-                <Button
-                  label="Create account"
-                  type="outline"
-                  size="lg"
-                  onClick={createAcount}
-                />
-              )}
-
-              {currentAccount?.name && (
-                <Button
-                  label="Go to Dashboard"
-                  color="#722f37"
-                  size="lg"
-                  onClick={goToDashboard}
-                />
-              )}
-            </div>
-          </div>
+      <div className={styles.content}>
+        <p className={styles.title}>SafeWine</p>
+        <p className={styles.description}>
+          Exclusive birth certificates for each produced bottle
+        </p>
+        <p className={styles.description}>
+          Avoid counterfeit and bring trust to your customers
+        </p>
+        <div className={styles.buttons}>
+          {!currentAccount?.address ? (
+            <>
+              <Button
+                label="Connect to Metamask"
+                color="#722f37"
+                size="lg"
+                onClick={connectToMetamask}
+              />
+            </>
+          ) : currentAccount?.name ? (
+            <Button label="Go to Dashboard" size="lg" onClick={goToDashboard} />
+          ) : isCreateAccount ? (
+            <CreateAccount
+              currentAccount={currentAccount}
+              createCellarAccount={createCellarAccount}
+              createShopAccount={createShopAccount}
+            />
+          ) : (
+            <Button
+              label="Create account"
+              size="lg"
+              onClick={toggleCreateAccount}
+            />
+          )}
         </div>
-        <EmptyContainer />
       </div>
     </div>
   );

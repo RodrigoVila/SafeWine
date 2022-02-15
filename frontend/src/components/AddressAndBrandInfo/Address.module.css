@@ -1,0 +1,19 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+  padding-top: 20px;
+  text-align: center;
+}
+
+.brand {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.userAccount {
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+  align-content: center;
+}
