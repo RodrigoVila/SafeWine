@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { NextPage } from "next";
+import styles from "./Transfer.module.css";
 
-import Button from "../src/components/Buttons/Filled";
-import Sidebar from "../src/components/Sidebar";
-import QRScanner from "../src/components/QRScanner";
-import useWeb3 from "../src/hooks/useWeb3";
-import styles from "../styles/AddBottle.module.css";
-import useIPFS from "../src/hooks/useIPFS";
-import Router from "next/router";
-import FilledButton from "../src/components/Buttons/Filled";
+import Button from "../Buttons/Filled";
+import Sidebar from "../Sidebar";
+import QRScanner from "../QRScanner";
+import useWeb3 from "../../hooks/useWeb3";
+import useIPFS from "../../hooks/useIPFS";
+import FilledButton from "../Buttons/Filled";
 
-const AddBottle: NextPage = () => {
+const TransferBottle = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [isScannerShown, setShowScanner] = useState(false);
@@ -19,7 +17,7 @@ const AddBottle: NextPage = () => {
   const [isDataUploaded, setDataUploaded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { currentAccount, mintNFT, getSender, getToken } = useWeb3();
+  const { currentAccount, mintNFT, getSender } = useWeb3();
   const {
     fileBUffer,
     handleFileInput,
@@ -28,7 +26,7 @@ const AddBottle: NextPage = () => {
   } = useIPFS();
 
   const handleSubmit = async (tokenURI: string) => {
-    await mintNFT(name, description, tokenURI)
+    await mintNFT(tokenURI)
       .then(() => {
         setIsLoading(false);
       })
@@ -65,7 +63,6 @@ const AddBottle: NextPage = () => {
   useEffect(() => {
     if (currentAccount.type !== "cellar") {
       alert("Please create cellar account first");
-      Router.push("./dashboard");
     }
   }, [currentAccount]);
 
@@ -110,11 +107,7 @@ const AddBottle: NextPage = () => {
                     onClick={getSender}
                     color="#5ca3"
                   />
-                  <FilledButton
-                    label="getToken"
-                    onClick={() => getToken(3)}
-                    color="#fa3c"
-                  />
+
                 </>
               )}
             </>
@@ -136,4 +129,4 @@ const AddBottle: NextPage = () => {
   );
 };
 
-export default AddBottle;
+export default TransferBottle;
