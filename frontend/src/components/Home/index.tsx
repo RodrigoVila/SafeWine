@@ -1,6 +1,6 @@
 import { MouseEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
-import styles from './Home.module.css';
+import styles from './styles.module.css';
 import Button from '../Buttons/Filled';
 import useWeb3 from '../../hooks/useWeb3';
 import AddressAndBrandInfo from '../AddressAndBrandInfo';
@@ -13,16 +13,7 @@ const Home = () => {
         connectToMetamask,
         createCellarAccount,
         createShopAccount,
-        getSender,
-        checkIfCellarExist,
     } = useWeb3();
-
-    // const currentAccount = { address: "", name: "" };
-
-    const goToDashboard = (e: MouseEvent<HTMLElement>) => {
-        e.preventDefault();
-        // Router.push("/dashboard");
-    };
 
     const toggleCreateAccount = () => setCreateAccount(!isCreateAccount);
 
@@ -37,21 +28,6 @@ const Home = () => {
                     Avoid counterfeit and bring trust to your customers
                 </p>
                 <div className={styles.buttons}>
-                    <Button
-                        label="checkIfCellarExist"
-                        color="#c4e1aa"
-                        size="lg"
-                        onClick={async () => {
-                            const cellarExist = await checkIfCellarExist();
-                            console.log('checkIfCellarExist', cellarExist);
-                        }}
-                    />
-                    <Button
-                        label="getSender"
-                        color="#d4e0aa"
-                        size="lg"
-                        onClick={getSender}
-                    />
                     {!currentAccount?.address ? (
                         <>
                             <Button

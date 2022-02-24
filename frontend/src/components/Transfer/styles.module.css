@@ -1,0 +1,60 @@
+.container {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    height: 92vh;
+    color: '#fff';
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.9);
+    width: 25%;
+    border: 2px solid #fff;
+    border-radius: 8px;
+    padding: 0 20px 20px 20px;
+}
+
+.title {
+    text-align: center;
+    padding: 10px 0;
+    color: #fff;
+}
+
+.dropdown {
+    padding: 5px 0 5px 5px;
+    width: 100%;
+}
+
+.input {
+    padding: 5px 0 5px 5px;
+    margin: 5px 0 10px 0;
+    width: 100%;
+}
+
+.label {
+    color: #fff;
+    font-size: 0.8rem;
+    margin: 5px 0;
+    text-align: left;
+}
+
+.message {
+    text-align: center;
+    font-weight: 600;
+    margin: 0;
+    margin-top: 5px;
+}
+
+.errorMessage {
+    color: lightcoral;
+}
+
+.successMessage {
+    color: lightgreen;
+}

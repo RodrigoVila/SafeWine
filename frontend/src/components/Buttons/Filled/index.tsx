@@ -1,5 +1,5 @@
 import React, { MouseEvent } from "react";
-import styles from "./FilledButton.module.css";
+import styles from "./styles.module.css";
 
 interface Props {
   label: string;

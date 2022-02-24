@@ -2,7 +2,7 @@ import { useEffect, useState, ChangeEvent } from "react";
 import Router from "next/router";
 import Button from "../Buttons/Filled";
 import useWeb3 from "../../hooks/useWeb3";
-import styles from "./CreateAccount.module.css";
+import styles from "./styles.module.css";
 
 interface Props {
   currentAccount: string | object;

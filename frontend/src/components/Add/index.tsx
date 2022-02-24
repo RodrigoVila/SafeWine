@@ -1,23 +1,20 @@
 import React, { useEffect, useState } from 'react';
 
 import Button from '../Buttons/Filled';
-import Sidebar from '../Sidebar';
-import QRScanner from '../QRScanner';
+import Navbar from '../Navbar';
 import useWeb3 from '../../hooks/useWeb3';
-import styles from './Add.module.css';
+import styles from './styles.module.css';
 import useIPFS from '../../hooks/useIPFS';
-import FilledButton from '../Buttons/Filled';
 
 const AddBottle = () => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [isScannerShown, setShowScanner] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
     const [isDataUploaded, setDataUploaded] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
-    const { currentAccount, mintNFT, getSender } = useWeb3();
+    const { mint } = useWeb3();
     const {
         fileBUffer,
         handleFileInput,
@@ -25,15 +22,25 @@ const AddBottle = () => {
         uploadMetadataToIPFS,
     } = useIPFS();
 
+    const clearMessages = () => {
+        setSuccessMessage('');
+        setErrorMessage('');
+    };
+
+    const clearInputs = () => {
+        setName('');
+        setDescription('');
+    };
+
     const handleSubmit = async (tokenURI: string) => {
-        await mintNFT(tokenURI)
+        await mint(tokenURI)
             .then(() => {
+                setSuccessMessage('Success!');
                 setIsLoading(false);
-                setName('');
-                setDescription('');
+                clearInputs();
             })
             .catch((e) => {
-                console.error('Mint error: ', e);
+                setErrorMessage(`Error: ${e}`);
                 setIsLoading(false);
             });
     };
@@ -45,6 +52,9 @@ const AddBottle = () => {
             return;
         }
         setIsLoading(true);
+
+        clearMessages();
+
         await uploadFileToIPFS().then((fileURI) => {
             fileURI !== undefined &&
                 uploadMetadataToIPFS(
@@ -57,23 +67,10 @@ const AddBottle = () => {
         });
     };
 
-    const handleData = (data) => {};
-    const handleError = (error) => {
-        error && alert(`Error pulling data: ${error}`);
-    };
-
-    const toggleModal = () => setShowScanner(!isScannerShown);
-
-    useEffect(() => {
-        if (currentAccount.type !== 'cellar') {
-            alert('Please create cellar account first');
-        }
-    }, [currentAccount]);
-
     return (
-        <div className={styles.container}>
-            <Sidebar />
-            <div className={styles.formContainer}>
+        <>
+            <Navbar />
+            <div className={styles.container}>
                 <div className={styles.form}>
                     <label className={styles.title}>Add Bottle</label>
                     <label className={styles.label}>Name</label>
@@ -81,6 +78,7 @@ const AddBottle = () => {
                         required
                         type="text"
                         className={styles.input}
+                        value={name}
                         onChange={(e) => setName(e.target.value)}
                     />
                     <label className={styles.label}>Description</label>
@@ -88,6 +86,7 @@ const AddBottle = () => {
                         required
                         type="text"
                         className={styles.input}
+                        value={description}
                         onChange={(e) => setDescription(e.target.value)}
                     />
                     <label className={styles.label}>Select NFT Image</label>
@@ -97,37 +96,25 @@ const AddBottle = () => {
                         className={styles.input}
                         onChange={(e) => handleFileInput(e)}
                     />
-                    {!isScannerShown && (
-                        <>
-                            {isLoading ? (
-                                <Button label="Loading..." onClick={() => {}} />
-                            ) : isDataUploaded ? (
-                                <Button label="Submit" onClick={handleSubmit} />
-                            ) : (
-                                <Button
-                                    label="Upload Data to IPFS"
-                                    onClick={uploadData}
-                                />
-                            )}
-                        </>
+
+                    {isLoading ? (
+                        <Button label="Loading..." onClick={() => {}} />
+                    ) : (
+                        <Button label="Create" onClick={uploadData} />
                     )}
                 </div>
-                <p className={`${styles.message} ${styles.errorMessage}`}>
-                    {errorMessage}
-                </p>
-                <p className={`${styles.message} ${styles.successMessage}`}>
-                    {successMessage}
-                </p>
-                {isScannerShown && (
-                    <div className={styles.scannerContainer}>
-                        <QRScanner
-                            handleData={handleData}
-                            handleError={handleError}
-                        />
-                    </div>
+                {errorMessage && (
+                    <p className={`${styles.message} ${styles.errorMessage}`}>
+                        {errorMessage}
+                    </p>
+                )}
+                {successMessage && (
+                    <p className={`${styles.message} ${styles.successMessage}`}>
+                        {successMessage}
+                    </p>
                 )}
             </div>
-        </div>
+        </>
     );
 };
 

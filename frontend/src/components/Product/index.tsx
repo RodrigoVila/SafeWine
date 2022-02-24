@@ -1,52 +1,49 @@
-import { useState, useEffect } from "react";
-import styles from "./Product.module.css";
-import { BsFillPatchCheckFill, BsPatchExclamation } from "react-icons/bs";
-import { getProductImage } from "../../services";
+import { useState, useEffect } from 'react';
+import styles from './styles.module.css';
+import { BsFillPatchCheckFill, BsPatchExclamationFill } from 'react-icons/bs';
+import { getMetadata } from '../../services';
+import useWeb3 from '../../hooks/useWeb3';
 
 interface Props {
+    id: string;
     name: string;
     description: string;
     uri: string;
-    isValid: boolean;
     mintedAt: string;
     onClick: () => void;
 }
 
-const Product = ({
-    name,
-    description,
-    uri,
-    isValid,
-    mintedAt,
-    onClick,
-}: Props) => {
-    const [imageUrl, setImageUrl] = useState("");
+const Product = ({ id, name, description, uri, mintedAt, onClick }: Props) => {
+    const [isTokenValid, setTokenValid] = useState(true);
+    const { isValidToken, tokens } = useWeb3();
 
     useEffect(() => {
-        const getImage = async () => {
-            if (uri) {
-                const url = await getProductImage(uri);
-                setImageUrl(url);
-            }
-        };
-        getImage();
-    }, [uri]);
+        if (id && tokens.length > 0) {
+            const getTokenValidity = async () => {
+                const valid = await isValidToken(id);
+                setTokenValid(valid);
+            };
+            getTokenValidity();
+        }
+    }, [id, tokens]);
 
     return (
         <div className={styles.container} onClick={onClick}>
-            <div className={styles.image}>
-                {imageUrl && <image src={imageUrl} width={150} height={150} />}
+            <div className={styles.imageContainer}>
+                {uri && (
+                    <img src={uri} alt="Product" className={styles.image} />
+                )}
             </div>
             <div className={styles.infoContainer}>
                 <div className={styles.title}>{name}</div>
                 <div className={styles.description}>{description}</div>
-                <div className={styles.description}>Minted At: {mintedAt}</div>
+                <div className={styles.description}>DoB: {mintedAt}</div>
             </div>
             <div className={styles.validityContainer}>
-                {isValid ? (
-                    <BsFillPatchCheckFill size={48} />
+                {isTokenValid ? (
+                    <BsFillPatchCheckFill size={48} color="lightblue" />
                 ) : (
-                    <BsPatchExclamation size={48} />
+                    <BsPatchExclamationFill size={48} color="#ff4444" />
                 )}
             </div>
         </div>

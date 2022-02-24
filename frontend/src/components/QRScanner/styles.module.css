@@ -1,7 +1,11 @@
 .container {
   display: flex;
+  width: 100%;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  height: 92vh;
+  color: '#fff';
 }
 
 .text {
@@ -12,7 +16,6 @@
 }
 
 .qrContainer {
-  background-color: #000!important;
 }
 
 .button {

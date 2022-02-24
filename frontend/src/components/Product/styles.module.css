@@ -1,0 +1,43 @@
+.container {
+    display: flex;
+    border: 2px solid #fff;
+    margin-top: 20px;
+    margin: 10px;
+    width: 100%;
+    max-width: 500px;
+    background-color: rgba(0, 0, 0, 0.6);
+    cursor: pointer;
+}
+
+.imageContainer {
+    height: 100%;
+    width: 240px;
+}
+
+.image {
+    width: 100%;
+    height: 100%;
+}
+
+.infoContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    padding: 5px 0 5px 10px;
+}
+
+.title {
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.description {
+}
+
+.validityContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 10px;
+}

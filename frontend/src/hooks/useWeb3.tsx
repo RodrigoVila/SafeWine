@@ -3,7 +3,7 @@ import MainContract from '../build/contracts/MainContract.json';
 import TokenContract from '../build/contracts/NFT.json';
 import useLocalStorage from './useLocalStorage';
 import getWeb3 from '../utils/getWeb3';
-import { useLocation } from 'react-router-dom';
+import { getMetadata } from '../services';
 
 //TODO: If network is NOT ropsten (or localhost for testing) then connect button must change
 
@@ -26,8 +26,6 @@ const useWeb3 = () => {
     const [currentAccount, setCurrentAccount, clearLocalStorage] =
         useLocalStorage('@SW_ACC', initialState);
 
-    const location = useLocation();
-
     //Wallet connection
 
     const connectToMetamask = async () => {
@@ -38,19 +36,16 @@ const useWeb3 = () => {
             );
             return;
         }
-        console.log('hola5');
-        console.log('hola6');
+
         const accounts = await ethereum.request({
             method: 'eth_requestAccounts',
         });
-        console.log('hola7: ', accounts);
 
         setCurrentAccount({
             address: accounts[0],
             name: '',
             type: '',
         });
-        console.log('hola7.1, currentAccount: ', currentAccount);
     };
 
     const clearStorage = () => {
@@ -75,23 +70,14 @@ const useWeb3 = () => {
     };
 
     const handleAccountChange = async (account: string) => {
-        console.log('hola7.5. Account: ', account);
         if (mainContractInstance && account) {
-            console.log('hola8, handleAccountChange');
             const cellarExist = await checkIfCellarExist();
-            console.log('hola8.1, ', cellarExist);
             if (cellarExist) {
-                console.log('hola8.5, handleAccountChange');
                 mainContractInstance.methods
                     .getCurrentCellar()
                     .call({ from: currentAccount.address })
                     .then((data: any) => {
-                        console.log('hola10');
                         if (data.name !== '') {
-                            console.log(
-                                'hola11, CELLARdata.name?: ',
-                                data.name
-                            );
                             setCurrentAccount({
                                 address: account,
                                 name: data.name,
@@ -110,9 +96,7 @@ const useWeb3 = () => {
                     .getCurrentShop()
                     .call({ from: currentAccount.address })
                     .then((data: any) => {
-                        console.log('hola13');
                         if (data.name !== '') {
-                            console.log('hola14, SHOPdata.name?: ', data.name);
                             setCurrentAccount({
                                 address: account,
                                 name: data.name,
@@ -137,19 +121,11 @@ const useWeb3 = () => {
     };
 
     const createCellarAccount = (name: string, description: string) => {
-        console.log('hola15');
         if (mainContractInstance) {
-            console.log(
-                'hola16, mainContractInstance: ',
-                mainContractInstance,
-                'localstorage acc: ',
-                currentAccount.address
-            );
             mainContractInstance.methods
                 .addNewCellar(name, description)
                 .send({ from: currentAccount.address })
                 .then((receipt: any) => {
-                    console.log('hola17, receipt: ', receipt);
                     if (receipt) {
                         handleAccountChange(currentAccount.address);
                         return receipt;
@@ -159,65 +135,88 @@ const useWeb3 = () => {
     };
 
     const createShopAccount = async (name: string, description: string) => {
-        console.log('hola18');
         if (mainContractInstance) {
-            console.log('hola19mainContractInstance ', mainContractInstance);
             await mainContractInstance.methods
                 .addNewShop(name, description)
                 .send({ from: currentAccount.address })
                 .then((receipt: any) => {
-                    console.log('hola20, receipt: ', receipt);
                     receipt && handleAccountChange(currentAccount.address);
                 });
         }
     };
 
-    const getSender = async () => {
-        await mainContractInstance.methods
-            .getSender()
-            .call({ from: currentAccount.address })
-            .then((sender: string) => {
-                console.log('!msg.sender: ', sender);
-            });
-    };
-
     //NFT Contract methods
 
+    const isValidToken = async (_tokenid: string) => {
+        return await nftContractInstance?.methods
+            .isValidToken(_tokenid)
+            .call({ from: currentAccount.address })
+            .then((valid: boolean) => valid);
+    };
+
+    const clearTokens = () => setTokens([]);
+
     const loadTokens = async () => {
-        console.log('!hola yy');
+        clearTokens();
         if (nftContractInstance) {
-            console.log('!111', nftContractInstance);
             await nftContractInstance.methods
                 .tokensOfOwner(currentAccount.address)
                 .call({ from: currentAccount.address })
-                .then((data) => console.log('!!tokens: ', data));
-
-            // tokens &&
-            //     tokens.map(async (tokenID: number, index: number) => {
-            //         const token =
-            //             await nftContractInstance.methods.getTokenById(tokenID);
-            //         console.log(
-            //             `!loadedtoken!. Index: ${index}. Token: ${token} `
-            //         );
-            //         // const newToken = {
-            //         // id: token.id,
-            //         // name: token.name,
-            //         // description: token.description,
-            //         // uri: token.tokenURI,
-            //         // isAvailable: token.isAvailable,
-            //         // mintedAt: token.mintedAt,
-            //         // };
-            //         // setTokens((tokens) => [...tokens, newToken]);
-            //     });
+                .then((tokens) => {
+                    tokens.map((tokenID: string) => {
+                        return nftContractInstance.methods
+                            .getTokenById(parseInt(tokenID))
+                            .call({ from: currentAccount.address })
+                            .then((token) => {
+                                const uri = token[1];
+                                getMetadata(uri).then((data) => {
+                                    const newToken = {
+                                        id: token[0],
+                                        name: data.name,
+                                        description: data.description,
+                                        uri: data.fileURI,
+                                        mintedAt: token[2],
+                                        isAvailable: token[3],
+                                    };
+                                    setTokens((tokens) => [
+                                        ...tokens,
+                                        newToken,
+                                    ]);
+                                });
+                            });
+                    });
+                });
         }
     };
 
-    const mintNFT = async (tokenURI: string) => {
+    const mint = async (tokenURI: string) => {
         nftContractInstance &&
             (await nftContractInstance.methods.mint(tokenURI).send({
                 from: currentAccount.address,
                 gas: 1000000,
             }));
+    };
+
+    const transfer = async (tokenID: string, to: string) => {
+        nftContractInstance &&
+            (await nftContractInstance.methods
+                .transfer(tokenID, to)
+                .send({
+                    from: currentAccount.address,
+                    gas: 1000000,
+                })
+                .then((data) => console.log('!Transfer OK: ', data)));
+    };
+
+    const sell = async (tokenID: string, to: string) => {
+        nftContractInstance &&
+            (await nftContractInstance.methods
+                .sell(tokenID, to)
+                .send({
+                    from: currentAccount.address,
+                    gas: 1000000,
+                })
+                .then((data) => console.log('!Sell OK: ', data)));
     };
 
     /** EFFECTS **/
@@ -233,22 +232,18 @@ const useWeb3 = () => {
                 );
                 return;
             }
-            console.log('hola0');
             const web3: any = await getWeb3(true);
-            console.log('hola1, web3: ', web3);
 
             const MainContractInstance = new web3.eth.Contract(
                 MainContract.abi,
                 // deployedNet && deployedNet.address
-                '0xc513e47e971b1a1179622475e6ca76359551d74c'
+                '0x64e9df92f5810efc16ee280c9bafceb3eab95b60'
             );
-            console.log('hola3');
             const NFTContractInstance = new web3.eth.Contract(
                 TokenContract.abi,
                 // deployedNet && deployedNet.address
-                '0xc513e47e971b1a1179622475e6ca76359551d74c'
+                '0xd72331afeb36d033cd0d9b4ecc1aa22d010fb5bf'
             );
-            console.log('hola4');
             setWeb3Instance(web3);
             setMainContractInstance(MainContractInstance);
             setNftContractInstance(NFTContractInstance);
@@ -294,43 +289,28 @@ const useWeb3 = () => {
 
     //Token loading on dashboard screen. Wallet must be connected first
     useEffect(() => {
-        currentAccount.address &&
-            nftContractInstance &&
-            location.pathname === '/dashboard' &&
-            loadTokens();
+        if (currentAccount.address) {
+            handleAccountChange(currentAccount.address);
+            if (nftContractInstance) {
+                loadTokens();
+            }
+        }
         //eslint-disable-next-line
     }, [currentAccount?.address, nftContractInstance]);
-
-    useEffect(() => {
-        console.log('!web3Instance', web3Instance);
-    }, [web3Instance]);
-
-    useEffect(() => {
-        console.log('!maincontractinstance', mainContractInstance);
-    }, [mainContractInstance]);
-
-    useEffect(() => {
-        console.log('!nftContractInstance', nftContractInstance);
-    }, [nftContractInstance]);
-
-    useEffect(() => {
-        console.log('!currentAccount', currentAccount);
-    }, [currentAccount]);
-
-    // useEffect(() => {
-    //   console.log("!tokens", tokens);
-    // }, [tokens]);
 
     return {
         currentAccount,
         tokens,
+        connectToMetamask,
         createCellarAccount,
         createShopAccount,
-        connectToMetamask,
-        mintNFT,
         checkIfCellarExist,
         checkIfShopExist,
-        getSender,
+        mint,
+        transfer,
+        sell,
+        loadTokens,
+        isValidToken,
     };
 };
 

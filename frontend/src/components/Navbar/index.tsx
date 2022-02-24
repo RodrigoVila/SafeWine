@@ -1,22 +1,32 @@
-import { MouseEvent } from 'react';
 import { Link } from 'react-router-dom';
-import styles from './Sidebar.module.css';
+import styles from './styles.module.css';
 import { BsPlusLg } from 'react-icons/bs';
-import { FiUsers, FiMinus } from 'react-icons/fi';
+import { FiMinus } from 'react-icons/fi';
 import { IoMdQrScanner } from 'react-icons/io';
-import { GoGift } from 'react-icons/go';
 import { SiDatabricks } from 'react-icons/si';
+import { BiTransfer } from 'react-icons/bi';
 import useWeb3 from '../../hooks/useWeb3';
-import AddressAndBrandInfo from '../AddressAndBrandInfo';
+import { GiWineBottle } from 'react-icons/gi';
 
 const Sidebar = () => {
     const { currentAccount } = useWeb3();
 
-    const createAccount = () => {};
+    const trimmedAccount = () => {
+        const { address } = currentAccount;
+        if (address) {
+            const firstSix = address.slice(0, 4);
+            const lastSix = address.slice(-6);
+
+            return `${firstSix}....${lastSix}`;
+        } else return '';
+    };
 
     return (
         <div className={styles.container}>
-            <AddressAndBrandInfo />
+            <div className={styles.brand}>
+                <GiWineBottle size={35} />
+                <div className={styles.brandName}>SafeWine</div>
+            </div>
             <div className={styles.navLinks}>
                 {currentAccount?.type === 'cellar' && (
                     <>
@@ -32,13 +42,10 @@ const Sidebar = () => {
                             <BsPlusLg />
                             <p className={styles.linkText}>Add bottle</p>
                         </Link>
-                        <Link to="/delete" className={styles.link}>
-                            <FiMinus />
-                            <p className={styles.linkText}>Delete bottle</p>
-                        </Link>
-                        <Link to="/ownership" className={styles.link}>
-                            <FiUsers />
-                            <p className={styles.linkText}>Change ownership</p>
+
+                        <Link to="/transfer" className={styles.link}>
+                            <BiTransfer />
+                            <p className={styles.linkText}>Transfer bottle</p>
                         </Link>
                     </>
                 )}
@@ -53,11 +60,14 @@ const Sidebar = () => {
                             <p className={styles.linkText}>Scan</p>
                         </Link>
                         <Link to="/sell" className={styles.link}>
-                            <GoGift />
+                            <FiMinus />
                             <p className={styles.linkText}>Sell bottle</p>
                         </Link>
                     </>
                 )}
+            </div>
+            <div className={styles.userAccount}>
+                {currentAccount && trimmedAccount()}
             </div>
         </div>
     );
