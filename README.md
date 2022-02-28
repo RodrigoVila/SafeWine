@@ -11,11 +11,11 @@ Every time a bottle is created, a Non Fungible Token (NFT) with an associated QR
 
 ## Technologies involved:
 
-React JS
-Typescript
-Solidity
-Truffle
-Ganache
-Web3
+* React JS
+* Typescript
+* Solidity
+* Truffle
+* Ganache
+* Web3
 
 ##
