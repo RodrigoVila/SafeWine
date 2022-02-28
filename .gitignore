@@ -4,7 +4,7 @@
 
 # Xcode
 #
-build/
+
 *.pbxuser
 !default.pbxuser
 *.mode1v3
@@ -23,7 +23,7 @@ DerivedData
 
 # Android/IntelliJ
 #
-build/
+
 .idea
 .gradle
 local.properties
@@ -61,5 +61,3 @@ buck-out/
 
 # Secrets
 secrets.json
-
-frontend next delete/
