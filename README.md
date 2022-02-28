@@ -38,6 +38,6 @@ https://safe-wine.vercel.app/
 * Add Token
 * Transfer Token
 
-###Shop account can:
+### Shop account can:
 * Sell Token (Same as transfer but also invalidates it)
 
