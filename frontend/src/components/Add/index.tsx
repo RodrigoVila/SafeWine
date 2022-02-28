@@ -1,20 +1,18 @@
-import React, { useEffect, useState } from 'react';
-
-import Button from '../Buttons/Filled';
+import { useState } from 'react';
+import styles from './styles.module.css';
+import Button from '../Button';
 import Navbar from '../Navbar';
 import useWeb3 from '../../hooks/useWeb3';
-import styles from './styles.module.css';
 import useIPFS from '../../hooks/useIPFS';
 
-const AddBottle = () => {
+const AddToken = () => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
-    const [isDataUploaded, setDataUploaded] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
-    const { mint } = useWeb3();
+    const { mint, chainError } = useWeb3();
     const {
         fileBUffer,
         handleFileInput,
@@ -70,52 +68,58 @@ const AddBottle = () => {
     return (
         <>
             <Navbar />
-            <div className={styles.container}>
-                <div className={styles.form}>
-                    <label className={styles.title}>Add Bottle</label>
-                    <label className={styles.label}>Name</label>
-                    <input
-                        required
-                        type="text"
-                        className={styles.input}
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                    />
-                    <label className={styles.label}>Description</label>
-                    <input
-                        required
-                        type="text"
-                        className={styles.input}
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                    />
-                    <label className={styles.label}>Select NFT Image</label>
-                    <input
-                        required
-                        type="file"
-                        className={styles.input}
-                        onChange={(e) => handleFileInput(e)}
-                    />
+            {!chainError && (
+                <div className={styles.container}>
+                    <div className={styles.form}>
+                        <label className={styles.title}>Add Bottle</label>
+                        <label className={styles.label}>Name</label>
+                        <input
+                            required
+                            type="text"
+                            className={styles.input}
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                        />
+                        <label className={styles.label}>Description</label>
+                        <input
+                            required
+                            type="text"
+                            className={styles.input}
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                        />
+                        <label className={styles.label}>Select NFT Image</label>
+                        <input
+                            required
+                            type="file"
+                            className={styles.input}
+                            onChange={(e) => handleFileInput(e)}
+                        />
 
-                    {isLoading ? (
-                        <Button label="Loading..." onClick={() => {}} />
-                    ) : (
-                        <Button label="Create" onClick={uploadData} />
+                        {isLoading ? (
+                            <Button label="Loading..." onClick={() => {}} />
+                        ) : (
+                            <Button label="Create" onClick={uploadData} />
+                        )}
+                    </div>
+                    {errorMessage && (
+                        <p
+                            className={`${styles.message} ${styles.errorMessage}`}
+                        >
+                            {errorMessage}
+                        </p>
+                    )}
+                    {successMessage && (
+                        <p
+                            className={`${styles.message} ${styles.successMessage}`}
+                        >
+                            {successMessage}
+                        </p>
                     )}
                 </div>
-                {errorMessage && (
-                    <p className={`${styles.message} ${styles.errorMessage}`}>
-                        {errorMessage}
-                    </p>
-                )}
-                {successMessage && (
-                    <p className={`${styles.message} ${styles.successMessage}`}>
-                        {successMessage}
-                    </p>
-                )}
-            </div>
+            )}
         </>
     );
 };
 
-export default AddBottle;
+export default AddToken;

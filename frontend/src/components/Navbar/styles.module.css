@@ -33,7 +33,12 @@
     padding: 0;
     font-weight: 600;
     cursor: pointer;
-    margin: 0 20px
+    margin: 0 20px;
+}
+
+.notAvailable {
+    cursor: default;
+    color: gray;
 }
 
 .linkText {
@@ -49,4 +54,9 @@
     font-weight: 700;
     text-align: center;
     align-content: center;
+}
+
+.chainError {
+    color: #ff4444;
+    font-size: 1.2rem;
 }

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import styles from './styles.module.css';
 import { BsFillPatchCheckFill, BsPatchExclamationFill } from 'react-icons/bs';
-import { getMetadata } from '../../services';
 import useWeb3 from '../../hooks/useWeb3';
 
 interface Props {

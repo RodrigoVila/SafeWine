@@ -19,9 +19,9 @@ type Token = {
 const initialState = { address: '', name: '', description: '', type: '' };
 
 const useWeb3 = () => {
-    const [web3Instance, setWeb3Instance] = useState<any>();
     const [mainContractInstance, setMainContractInstance] = useState<any>(null);
     const [nftContractInstance, setNftContractInstance] = useState<any>(null);
+    const [chainError, setChainError] = useState(false);
     const [tokens, setTokens] = useState<Token[]>([]);
     const [currentAccount, setCurrentAccount, clearLocalStorage] =
         useLocalStorage('@SW_ACC', initialState);
@@ -147,6 +147,8 @@ const useWeb3 = () => {
 
     //NFT Contract methods
 
+    const clearTokens = () => setTokens([]);
+
     const isValidToken = async (_tokenid: string) => {
         return await nftContractInstance?.methods
             .isValidToken(_tokenid)
@@ -154,7 +156,26 @@ const useWeb3 = () => {
             .then((valid: boolean) => valid);
     };
 
-    const clearTokens = () => setTokens([]);
+    const getTokenByID = (tokenID: string) => {
+        return nftContractInstance.methods
+            .getTokenById(parseInt(tokenID))
+            .call({ from: currentAccount.address })
+            .then((token) => {
+                const uri = token[1];
+                getMetadata(uri).then((data) => {
+                    const newToken = {
+                        id: token[0],
+                        name: data.name,
+                        description: data.description,
+                        uri: data.fileURI,
+                        mintedAt: token[2],
+                        isAvailable: token[3],
+                    };
+
+                    return newToken;
+                });
+            });
+    };
 
     const loadTokens = async () => {
         clearTokens();
@@ -225,7 +246,13 @@ const useWeb3 = () => {
 
     useEffect(() => {
         const load = async () => {
+            const MainContractAddress =
+                '0x64e9df92f5810efc16ee280c9bafceb3eab95b60';
+            const NFTContractAddress =
+                '0xd72331afeb36d033cd0d9b4ecc1aa22d010fb5bf';
+
             const { ethereum } = window as any;
+
             if (!ethereum) {
                 alert(
                     'Non-Ethereum browser detected. Please install MetaMask plugin'
@@ -236,15 +263,12 @@ const useWeb3 = () => {
 
             const MainContractInstance = new web3.eth.Contract(
                 MainContract.abi,
-                // deployedNet && deployedNet.address
-                '0x64e9df92f5810efc16ee280c9bafceb3eab95b60'
+                MainContractAddress
             );
             const NFTContractInstance = new web3.eth.Contract(
                 TokenContract.abi,
-                // deployedNet && deployedNet.address
-                '0xd72331afeb36d033cd0d9b4ecc1aa22d010fb5bf'
+                NFTContractAddress
             );
-            setWeb3Instance(web3);
             setMainContractInstance(MainContractInstance);
             setNftContractInstance(NFTContractInstance);
         };
@@ -262,8 +286,10 @@ const useWeb3 = () => {
                     ? handleAccountChange(accounts[0])
                     : clearStorage();
             });
-            ethereum.on('chainChanged', (/*chainId*/) => {
-                window.location.reload();
+            ethereum.on('chainChanged', (chainId) => {
+                chainId === '0x3'
+                    ? window.location.reload()
+                    : setChainError(true);
             });
 
             !ethereum.isConnected() && clearStorage();
@@ -279,8 +305,10 @@ const useWeb3 = () => {
                             : clearStorage();
                     }
                 );
-                ethereum.removeListener('chainChanged', (/*chainId*/) => {
-                    window.location.reload();
+                ethereum.removeListener('chainChanged', (chainId) => {
+                    chainId === '0x3'
+                        ? window.location.reload()
+                        : setChainError(true);
                 });
             }
         };
@@ -301,6 +329,7 @@ const useWeb3 = () => {
     return {
         currentAccount,
         tokens,
+        chainError,
         connectToMetamask,
         createCellarAccount,
         createShopAccount,
@@ -311,6 +340,7 @@ const useWeb3 = () => {
         sell,
         loadTokens,
         isValidToken,
+        getTokenByID,
     };
 };
 

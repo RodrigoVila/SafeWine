@@ -1,15 +1,18 @@
-import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './styles.module.css';
+
 import { GoVerified } from 'react-icons/go';
-import { IoMdClose } from 'react-icons/io';
+import { IoMdArrowBack } from 'react-icons/io';
 import { ImSad2 } from 'react-icons/im';
 
 interface Props {
     isErrorModal?: boolean;
-    toggleModal: () => void;
+    tokenID: string | undefined;
 }
 
-const SuccessErrorScreen = ({ toggleModal, isErrorModal = false }: Props) => {
+const SuccessErrorScreen = ({ isErrorModal = false, tokenID }: Props) => {
+    const navigate = useNavigate();
+    const onClick = () => navigate('/dashboard');
     return (
         <div className={styles.container}>
             <div className={styles.content}>
@@ -18,28 +21,18 @@ const SuccessErrorScreen = ({ toggleModal, isErrorModal = false }: Props) => {
                 ) : (
                     <GoVerified size={100} />
                 )}
-                <div className={styles.closeIcon} onClick={toggleModal}>
-                    <IoMdClose size={35} />
+                <div className={styles.backIcon} onClick={onClick}>
+                    <IoMdArrowBack size={35} />
                 </div>
                 <div className={styles.title}>
                     {isErrorModal ? 'Oh dear!' : 'Success!'}
                 </div>
                 <div className={styles.description}>
                     {isErrorModal
-                        ? "We can't verify this is authentic."
+                        ? "We can't verify this item authenticity. Please report this bottle to the shop  manager."
                         : 'We can verify that this bottle is authentic!'}
                 </div>
-                <div className={styles.list}>
-                    <div className={styles.item}>
-                        Proccessed At: --Cellar Info --
-                    </div>
-                    <div className={styles.item}>
-                        Birth date: --Date Info--.
-                    </div>
-                    <div className={styles.item}>
-                        Current owner is --Owner info--
-                    </div>
-                </div>
+                <div className={styles.item}>Token ID: {tokenID}</div>
             </div>
         </div>
     );

@@ -1,3 +1,17 @@
+.modalContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.link {
+    font-weight: 700;
+    font-size: 1.25rem;
+    text-align: center;
+    color: #fff;
+    margin-top: 10px;
+}
 .container {
     display: flex;
     width: 100%;

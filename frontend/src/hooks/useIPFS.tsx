@@ -1,12 +1,6 @@
 import { useEffect, useState } from 'react';
 import { create } from 'ipfs-http-client';
 
-interface File {
-    name: string;
-    description: string;
-    tokenImage: string;
-}
-
 const useIPFS = () => {
     const [IPFS, setIPFS] = useState<any>();
     const [fileBUffer, setFileBuffer] = useState<any[]>([]);

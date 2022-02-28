@@ -2,7 +2,7 @@ import styles from './styles.module.css';
 
 interface Props {
     children: any;
-    toggleModal: () => void;
+    toggleModal?: () => void;
 }
 
 const Modal = ({ children, toggleModal }: Props) => {
