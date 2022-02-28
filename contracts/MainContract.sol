@@ -5,6 +5,9 @@ pragma solidity 0.8.0;
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract MainContract is AccessControl {
+
+     /*** Data Types ***/
+
     struct Cellar {
         string name;
         string description;
@@ -18,8 +21,12 @@ contract MainContract is AccessControl {
     bytes32 public constant CELLAR_ROLE = keccak256("CELLAR_ROLE");
     bytes32 public constant SHOP_ROLE = keccak256("SHOP_ROLE");
 
+    /*** Storage ***/
+
     mapping(address => Cellar) public cellars;
     mapping(address => Shop) public shops;
+
+    /*** Modifiers ***/
 
     modifier onlyCellar() {
         require(hasRole(CELLAR_ROLE, msg.sender), "Only Cellar");
@@ -31,10 +38,13 @@ contract MainContract is AccessControl {
         _;
     }
 
+    /*** Methods ***/
+    
     function addNewCellar(string memory _name, string memory _description)
         public
         returns (Cellar memory)
     {
+        require(bytes(_name).length >0 && bytes(_description).length >0 , "Name and desc cant be empty");
         require(!checkIfCellarExist(), "Cellar Already Exist");
         cellars[msg.sender].name = _name;
         cellars[msg.sender].description = _description;
@@ -46,6 +56,7 @@ contract MainContract is AccessControl {
         public
         returns (Shop memory)
     {
+        require(bytes(_name).length >0 && bytes(_description).length >0 , "Name and desc cant be empty");
         require(!checkIfShopExist(), "Shop Already Exist");
         shops[msg.sender].name = _name;
         shops[msg.sender].description = _description;

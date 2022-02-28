@@ -4,157 +4,169 @@ pragma solidity 0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "./MainContract.sol";
 
-contract NFT is ERC721URIStorage, MainContract {
+contract NFT is ERC721URIStorage {
     using Counters for Counters.Counter;
 
-    //Structs
+    /*** Data Types ***/
 
     struct Token {
         uint256 id;
-        string name;
-        string description;
         string tokenURI;
         uint256 mintedAt;
-        bool isAvailable;
+        address mintedBy; //This could be cellar name inherited from main contract
     }
 
-    //Storage
+    /*** Storage ***/
 
+    //Token ID count
     Counters.Counter private _tokenIds;
+
+    //Tracks tokens (TODO: Is this necessary? Already tracking tokens in next mapping)
     Token[] tokens;
-    mapping(uint256 => Token) private idToToken;
-    mapping(uint256 => string) private tokenURIs;
-    mapping(address => uint256[]) private ownedTokensByAddress;
 
-    //Events
+    //Tracks tokens 
+    mapping(uint256 => Token) private indexToToken;
 
-    event LogTokenSold(uint256 tokenId, address currentOwner, address newOwner);
+    //Ownership by token id
+    mapping(uint256 => address) private tokenIndexToOwner;
 
-    event LogTokenCreate(
-        uint256 id,
-        string name,
-        string description,
-        string tokenURI,
-        uint256 mintedAt,
-        address mintedBy
-    );
+    //How many tokens owner has
+    mapping(address => uint256) ownershipTokenCount;
 
-    event LogTokenTransfer(uint256 _tokenId, address _from, address _to);
+    //Token validity (Used to know if bottle is authentic or not).
+    mapping(uint256 => bool) public tokenIndexIsValid;
 
-    //Constructor
+    /*** Events ***/
 
-    constructor() ERC721("Wine", "WNE") {}
+    event Mint(uint256 id, string tokenURI, uint256 mintedAt, address mintedBy);
+    event Sell(address seller, address to, uint256 id);
 
-    //Cellar functions
+    /*** Constructor ***/
 
-    function mint(
-        string memory _name,
-        string memory _description,
-        string memory _tokenURI
-    ) public onlyCellar returns (uint256) {
+    constructor() ERC721("WineBottle", "WINE") {}
+
+    /*** Methods ***/
+
+    //Return owner address by token ID
+    function getOwnerOf(uint256 _tokenId) public view returns (address) {
+        return super.ownerOf(_tokenId);
+    }
+
+    //Return token count
+    function getBalance(address _address) public view returns (uint256) {
+        return super.balanceOf(_address);
+    }
+
+    //Return token total supply
+    function totalSupply() public view returns (uint256) {
+        return tokens.length;
+    }
+
+    //Return token validity (Sold wine = Invalid token)
+    function isValidToken(uint256 _tokenId) public view returns (bool) {
+        return tokenIndexIsValid[_tokenId];
+    }
+
+    // TODO: Find a better way to do this. If token amount increases, this will lead
+    // to a problem.
+    //Return array of token owned IDs
+    function tokensOfOwner(address _owner)
+        public
+        view
+        returns (uint256[] memory)
+    {
+        uint256 balance = balanceOf(_owner);
+
+        if (balance == 0) {
+            return new uint256[](0);
+        } else {
+            //Memory arrays needs to have a fixed size
+            uint256[] memory result = new uint256[](balance);
+            uint256 maxTokenId = totalSupply();
+            uint256 idx = 0;
+            uint256 tokenId;
+            
+            for (tokenId = 1; tokenId <= maxTokenId; tokenId++) {
+                if (tokenIndexToOwner[tokenId] == _owner) {
+                    result[idx] = tokenId;
+                    idx++;
+                }
+            }
+            return result;
+        }
+    }
+
+    // Given an id, returns token data 
+    function getTokenById(uint256 _tokenId) public view returns (uint256, string memory, uint256, bool) {
+        uint256 id = indexToToken[_tokenId].id;
+        string memory uri = indexToToken[_tokenId].tokenURI;
+        uint256 mintedAt = indexToToken[_tokenId].mintedAt;
+        bool isValid = tokenIndexIsValid[_tokenId];
+
+        return (id, uri, mintedAt, isValid);
+   }
+
+    function mint(string memory _tokenURI) public returns (uint256) {
         _tokenIds.increment();
 
-        uint newItemId =_tokenIds.current();
         //Token count increment before creation to avoid index 0
-        Token memory token = Token({        
-            id:newItemId,
-            name: _name,
-            description: _description,
+        uint256 newItemId = _tokenIds.current();
+
+        Token memory token = Token({
+            id: newItemId,
             tokenURI: _tokenURI,
             mintedAt: block.timestamp,
-            isAvailable: true
+            mintedBy: msg.sender
         });
-        idToToken[newItemId] = token;
         tokens.push(token);
+        indexToToken[newItemId] = token;
+        tokenIndexToOwner[newItemId] = msg.sender;
+        tokenIndexIsValid[newItemId] = true;
+        ownershipTokenCount[msg.sender]++;
 
         super._mint(msg.sender, newItemId);
         super._setTokenURI(newItemId, _tokenURI);
 
-        ownedTokensByAddress[msg.sender].push(newItemId);
-
-        emit LogTokenCreate(
-            newItemId,
-            _name,
-            _description,
-            _tokenURI,
-            block.timestamp,
-            msg.sender
-        );
+        emit Mint(newItemId, _tokenURI, block.timestamp, msg.sender);
 
         return newItemId;
     }
 
-    //getTokens funciona bien en Remix. Probar hacer deploy en Ropsten para ver como llegan los datos en React
-    //Luego seguir con transfer/sell token. Problema = Como modifico items del array ownedTokensByAddress.
-
-    function getTokens() public view returns (Token[] memory) {
-        uint256[] memory ownedTokens = getTokenIDsByAddress(msg.sender);
-        Token[] memory tokenArray = new Token[](ownedTokens.length);
-        uint counter = 0;
-
-        for(uint i=0; i < ownedTokens.length; i++){
-            tokenArray[counter].id = idToToken[ownedTokens[i]].id;
-            tokenArray[counter].name = idToToken[ownedTokens[i]].name;
-            tokenArray[counter].description =idToToken[ownedTokens[i]].description;
-            tokenArray[counter].tokenURI =idToToken[ownedTokens[i]].tokenURI;
-            tokenArray[counter].mintedAt = idToToken[ownedTokens[i]].mintedAt;
-            tokenArray[counter].isAvailable = idToToken[ownedTokens[i]].isAvailable;
-            counter++;
-        }
-        return tokenArray;
-    }
-
-    // function transferToken(
-    //     uint256 _tokenId,
-    //     address _from,
-    //     address _to
-    // ) public onlyCellar returns (uint256) {
-    //    idToToken[_tokenId].currentOwner = _to;
-
-    //     uint256[] memory currentOwnerTokens = getTokenIDsByAddress(_from);
-    //     uint256[] memory newOwnerTokens = getTokenIDsByAddress(_to);
-
-    //     for(uint i=0; i < currentOwnerTokens.length; i++){
-    //         tokenArray[counter].id = idToToken[currentOwnerTokens[i]].id;
-    //         tokenArray[counter].name = idToToken[currentOwnerTokens[i]].name;
-    //         tokenArray[counter].description =idToToken[currentOwnerTokens[i]].description;
-    //         tokenArray[counter].tokenURI =idToToken[currentOwnerTokens[i]].tokenURI;
-    //         tokenArray[counter].mintedAt = idToToken[currentOwnerTokens[i]].mintedAt;
-    //         tokenArray[counter].isAvailable = idToToken[currentOwnerTokens[i]].isAvailable;
-    //         counter++;
-    //     }
-    //     emit LogTokenTransfer(_tokenId, _from, _to);
-    //     return _tokenId;
-    // }
-
-    // //Cellar - Shop
-
-    // function sellToken(
-    //     uint256 _tokenId,
-    //     address _from,
-    //     address _to
-    // ) public onlyShop onlyCellar returns (uint256) {
-    //     tokens[_tokenId].isAvailable = false;
-    //     tokens[_tokenId].currentOwner = _to;
-    //     emit LogTokenSold(_tokenId, _from, _to);
-    //     return _tokenId;
-    // }
-
-
-    function getTokenIDsByAddress(address _address) public view returns (uint256 [] memory) {
-        return ownedTokensByAddress[_address];
-    }
-
-    //As both ERC721 and AccessControl include supportsInterface we need to override both
-    function supportsInterface(bytes4 interfaceId)
+    function transfer(uint256 _tokenId, address _to)
         public
-        view
-        virtual
-        override(ERC721, AccessControl)
-        returns (bool)
+        returns (uint256)
     {
-        return super.supportsInterface(interfaceId);
+        address seller = ownerOf(_tokenId);
+        require(seller == msg.sender, "Only owner of this token can transfer");
+
+        ownershipTokenCount[_to]++;
+        ownershipTokenCount[seller]--;
+        tokenIndexToOwner[_tokenId] = _to;
+
+        transferFrom(seller, _to, _tokenId);
+
+        emit Transfer(seller, _to, _tokenId);
+
+        return _tokenId;
+    }
+
+    function sell(uint256 _tokenId, address _to)
+        public
+        returns (uint256)
+    {        
+        address seller = ownerOf(_tokenId);
+        require(seller == msg.sender, "Only owner of this token can sell");
+
+        ownershipTokenCount[_to]++;
+        ownershipTokenCount[seller]--;
+        tokenIndexToOwner[_tokenId] = _to;
+        tokenIndexIsValid[_tokenId] = false;
+
+        transferFrom(seller, _to, _tokenId);
+
+        emit Sell(seller, _to, _tokenId);
+
+        return _tokenId;
     }
 }

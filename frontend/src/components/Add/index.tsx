@@ -99,7 +99,7 @@ const AddToken = () => {
                         {isLoading ? (
                             <Button label="Loading..." onClick={() => {}} />
                         ) : (
-                            <Button label="Create" onClick={uploadData} />
+                            <Button label="Add" onClick={uploadData} />
                         )}
                     </div>
                     {errorMessage && (
