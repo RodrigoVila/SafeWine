@@ -20,11 +20,11 @@ Every time a bottle is created, a Non Fungible Token (NFT) with an associated QR
 
 ## How to use?
 1) Clone this repo `git clone git@github.com:RodrigoVila/SafeWine.git` or `git clone https://github.com/RodrigoVila/SafeWine.git`
-2) Go to Frontend folder cd frontend
-3) Install dependencies npm install ir yarn install
-4) Run app npm start
+2) Go to Frontend folder `cd frontend`
+3) Install dependencies `npm install` or `yarn install`
+4) Run app `npm start`
 
-or...
+or if you preffer...
 
 ## Use the live demo
 https://safe-wine.vercel.app/
