@@ -29,3 +29,15 @@ or if you preffer...
 
 ## Use the live demo
 https://safe-wine.vercel.app/
+
+## Inside the app
+1) Connect to Metamask (Metamask required)
+2) Create an account (Shop or Cellar)
+
+### Cellar account can:
+* Add Token
+* Transfer Token
+
+###Shop account can:
+* Sell Token (Same as transfer but also invalidates it)
+
