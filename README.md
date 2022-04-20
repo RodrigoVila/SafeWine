@@ -25,7 +25,7 @@ Every time a bottle is created, a Non Fungible Token (NFT) with an associated QR
 5) Install dependencies `npm install` or `yarn install`
 6) Run app `npm start`
 
-or if you preffer...
+or...
 
 ## Use the live demo
 https://safe-wine.vercel.app/
