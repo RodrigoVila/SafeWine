@@ -30,9 +30,13 @@ or if you preffer...
 ## Use the live demo
 https://safe-wine.vercel.app/
 
-## Inside the app
-1) Connect to Metamask (Metamask required)
-2) Create an account (Shop or Cellar)
+## Important Info
+1) Metamask is required
+2) This app works only in ROPSTEN network
+3) Some fake ethers are required to sign transactions
+
+#### Guide for the last 3 steps
+https://devtonight.com/posts/metamask-testnet-wallet-setup-for-blockchain-development#:~:text=Add%20Custom%20Testnet%20Networks%20To,%2C%20RPC%20URL%2C%20chain%20ID.
 
 ### Cellar account can:
 * Add Token
