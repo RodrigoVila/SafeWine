@@ -33,10 +33,10 @@ https://safe-wine.vercel.app/
 ## Important Info
 1) Metamask is required
 2) This app works only in ROPSTEN network
-3) Faucet (fake) ethers are required to sign transactions (1 should be enough). 
+3) Test (fake) ethers are required to sign transactions, 1 should be more than enough. 
 
 
-#### [How to install Metamask, setup Ropsten Network and get faucet ethers](https://devtonight.com/posts/metamask-testnet-wallet-setup-for-blockchain-development#:~:text=Add%20Custom%20Testnet%20Networks%20To,%2C%20RPC%20URL%2C%20chain%20ID)
+#### [How to install Metamask, setup Ropsten Network and get test ethers](https://devtonight.com/posts/metamask-testnet-wallet-setup-for-blockchain-development#:~:text=Add%20Custom%20Testnet%20Networks%20To,%2C%20RPC%20URL%2C%20chain%20ID)
 
 ## Inside the app
 1) Login with Metamask
