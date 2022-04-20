@@ -38,8 +38,13 @@ https://safe-wine.vercel.app/
 
 #### [How to install Metamask, setup Ropsten Network and get faucet ethers](https://devtonight.com/posts/metamask-testnet-wallet-setup-for-blockchain-development#:~:text=Add%20Custom%20Testnet%20Networks%20To,%2C%20RPC%20URL%2C%20chain%20ID)
 
+## Inside the app
+1) Login with Metamask
+2) Create Cellar or Shop account (They have different permissions.
+3) Try minting, transfering and selling bottles.
+
 ### Cellar account can:
-* Add Token
+* Mint Token
 * Transfer Token
 
 ### Shop account can:
