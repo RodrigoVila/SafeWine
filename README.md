@@ -8,7 +8,7 @@ Through blockchain technology, SafeWine offers the possibility of creating a sin
 ## How?
 
 Every time a bottle is created, a Non Fungible Token (NFT) with an associated QR Code is generated. This token can be transferred to a new owner, or it can be sold invalidating it.
-In the future, the QR could be replaced by an NFC tag to prevent the code from being copypasted and open up the opportunity to trace bottles and making an efficient supply chain.
+In future versions, the QR could be replaced by an NFC tag to prevent the code from being copypasted. This will open up different opportunities like trace bottles for making a more efficient supply chain.
 
 ## Technologies involved:
 
